@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Details</title>
+<style>
+body { font-family: Arial; background:#f0f8ff; text-align: center; }
+img { width: 60%; height: 40%; }
+
+.detail-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  background:#023E8A;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+  font-size: 20px;
+  color: white;
+}
+.detail-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+#gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#gallery img {
+  width: 300px; 
+  height: 300px;
+  margin: 10px;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+#gallery img:hover { transform: scale(1.1); }
+
+#mapSection iframe {
+  width: 100%;
+  height: 400px;
+  border: 0;
+  border-radius: 10px;
+}
+
+/* Feedback Section Styling */
+
+/* Compact Feedback Section */
+#feedbackSection {
+  background:#023E8A;
+  color: #eee;
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 500px;
+  height: 220px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(255,255,255,0.1);
+  text-align: left;
+}
+
+#feedbackSection h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color:rgb(11, 10, 10); /* heading highlight */
+}
+
+#feedbackSection input, 
+#feedbackSection textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background: #000000;
+  color: #d9d9d9;
+  font-size: 14px;
+}
+
+#feedbackSection button {
+  background: #ebc117;
+  color: #000;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; /* center button */
+
+}
+
+#feedbackSection button:hover {
+  background: #e6b800;
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="name"></h1>
+<img id="image" alt="Detail Image">
+
+<!-- Brief Introduction -->
+<p id="desc"></p>
+
+<!-- Detailed Paragraph -->
+<div class="detail-container">
+  <p id="paragraph"></p>
+
+  <!-- Place Info -->
+  <div id="extraInfo" style="display:none;">
+    <p><b>Timings:</b> <span id="timings"></span></p>
+    <p><b>Entry Fee:</b> <span id="entryFee"></span></p>
+    <p><b>Best Time:</b> <span id="bestTime"></span></p>
+    <p><b>Nearby:</b> <span id="nearby"></span></p>
+  </div>
+
+  <!-- Hotel Info -->
+  <div id="hotelInfo" style="display:none;">
+    <h2>Rooms</h2>
+    <ul id="rooms"></ul>
+
+    <h2>Facilities</h2>
+    <ul id="facilities"></ul>
+
+    <p><b>Timings:</b> <span id="hotelTimings"></span></p>
+    <p><b>Tariff:</b> <span id="hotelEntryFee"></span></p>
+    <p><b>Best Time:</b> <span id="hotelBestTime"></span></p>
+    <p><b>Nearby:</b> <span id="hotelNearby"></span></p>
+  </div>
+
+  <!-- Food Info -->
+  <div id="foodInfo" style="display:none;">
+    <h2>Varieties</h2>
+    <ul id="varieties"></ul>
+
+    <h2>Best Places</h2>
+    <ul id="bestPlaces"></ul>
+
+    <p><b>Price Range:</b> <span id="priceRange"></span></p>
+    <p><b>Best Time:</b> <span id="foodBestTime"></span></p>
+  </div>
+
+  <!-- Map Section -->
+  <div id="mapSection" style="display:none;">
+    <h2>Location Map</h2>
+    <iframe id="mapFrame" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+
+  <!-- Contact Section -->
+  <div id="contactSection" style="display:none;">
+    <h2>Contact Info</h2>
+    <p><b>Phone:</b> <span id="phone"></span></p>
+    <p><b>Email:</b> <span id="email"></span></p>
+  </div>
+</div>
+
+<!-- Gallery -->
+<h2>Photo Gallery</h2>
+<div id="gallery"></div>
+
+<!-- Feedback Section (below gallery) -->
+<!-- Feedback Section (below gallery) -->
+<div id="feedbackSection">
+  <h3>Share Your Feedback</h3>
+  <form>
+    <input type="text" name="name" placeholder="Your Name">
+    <textarea name="feedback" rows="3" placeholder="Write feedback..."></textarea>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+let item = JSON.parse(localStorage.getItem("selectedItem")) || {};
+
+// Basic info
+document.getElementById("name").innerText = item.name || "";
+document.getElementById("image").src = item.img || "";
+document.getElementById("desc").innerText = item.desc || "";
+document.getElementById("paragraph").innerText = item.paragraph || "";
+
+// Place Info
+if(item.type === "place"){
+  document.getElementById("extraInfo").style.display = "block";
+  document.getElementById("timings").innerText = item.timings || "Info not available";
+  document.getElementById("entryFee").innerText = item.entryFee || "Info not available";
+  document.getElementById("bestTime").innerText = item.bestTime || "Info not available";
+  document.getElementById("nearby").innerText = item.nearby || "Info not available";
+}
+
+// Hotel Info
+if(item.type === "hotel"){
+  document.getElementById("hotelInfo").style.display = "block";
+
+  if(item.rooms){
+    let roomsList = document.getElementById("rooms");
+    item.rooms.forEach(r => {
+      let li = document.createElement("li");
+      li.innerText = r;
+      roomsList.appendChild(li);
+    });
+  }
+
+  if(item.facilities){
+    let facilitiesList = document.getElementById("facilities");
+    item.facilities.forEach(f => {
+      let li = document.createElement("li");
+      li.innerText = f;
+      facilitiesList.appendChild(li);
+    });
+  }
+
+  document.getElementById("hotelTimings").innerText = item.timings || "Info not available";
+  document.getElementById("hotelEntryFee").innerText = item.entryFee || "Info not available";
+  document.getElementById("hotelBestTime").innerText = item.bestTime || "Info not available";
+  document.getElementById("hotelNearby").innerText = item.nearby || "Info not available";
+}
+
+// Food Info
+if(item.type === "food"){
+  document.getElementById("foodInfo").style.display = "block";
+
+  if(item.varieties){
+    let vList = document.getElementById("varieties");
+    item.varieties.forEach(v => {
+      let li = document.createElement("li");
+      li.innerText = v;
+      vList.appendChild(li);
+    });
+  }
+
+  if(item.bestPlaces){
+    let bpList = document.getElementById("bestPlaces");
+    item.bestPlaces.forEach(p => {
+      let li = document.createElement("li");
+      li.innerText = p;
+      bpList.appendChild(li);
+    });
+  }
+
+  document.getElementById("priceRange").innerText = item.priceRange || "Info not available";
+  document.getElementById("foodBestTime").innerText = item.bestTime || "Info not available";
+}
+
+// Map Section
+if(item.map){
+  document.getElementById("mapSection").style.display = "block";
+  document.getElementById("mapFrame").src = item.map;
+}
+
+// Contact Section
+if(item.contact){
+  document.getElementById("contactSection").style.display = "block";
+  document.getElementById("phone").innerText = item.contact.phone || "Not available";
+  document.getElementById("email").innerText = item.contact.email || "Not available";
+}
+
+// Gallery
+if(item.gallery){
+  let galleryDiv = document.getElementById("gallery");
+  item.gallery.forEach(img => {
+    let imageTag = document.createElement("img");
+    imageTag.src = img;
+    galleryDiv.appendChild(imageTag);
+  });
+}
+</script>
+
+</body>
+</html>
